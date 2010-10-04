@@ -211,7 +211,7 @@ public class HttpRequest
         		String value = this.postMap.get(key);
         		try {
     	            key = URLEncoder.encode(key, charset);
-    	            value = URLEncoder.encode(value, charset);
+    	            value = URLEncoder.encode(value==null?"":value, charset);
     	            buffer.append(key);
     	            buffer.append("=");
     	            buffer.append(value);

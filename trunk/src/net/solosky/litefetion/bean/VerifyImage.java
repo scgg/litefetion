@@ -41,7 +41,15 @@ public class VerifyImage
 	private String verifyCode;
 	private byte[] imageData;
 	private String sessionId;
+	private String verifyType;
 	
+	
+	public String getVerifyType() {
+    	return verifyType;
+    }
+	public void setVerifyType(String verifyType) {
+    	this.verifyType = verifyType;
+    }
 	public String getVerifyCode() {
     	return verifyCode;
     }

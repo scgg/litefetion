@@ -127,12 +127,14 @@ public class HttpClient
     		Iterator<String> nit = newCookies.iterator();
     		while(nit.hasNext()) {
     			Cookie cookie = new Cookie(nit.next());
-    			//如果当前cookie的值为空，并且当前cookie列表中有之前同名的cookie，删除之前的cookie
-    			if(cookie.getValue()==null && cookie.getValue().length()==0) {
-    				Cookie oldCookie = this.getCookie(cookie.getName());
-    				if(oldCookie!=null) {
+    			Cookie oldCookie = this.getCookie(cookie.getName());
+    			//如果有之前相同名字的Cookie,删除之前的cookie
+    			if(oldCookie!=null) {
     					this.cookieList.remove(oldCookie);
-    				}
+            			//如果新cookie的值不为空，就添加到新的cookie到列表中
+            			if(cookie.getValue()!=null && cookie.getValue().length()>0) {
+            				this.cookieList.add(cookie);
+            			}
     			}else {
     				this.cookieList.add(cookie);
     			}
