@@ -25,16 +25,21 @@
  */
 package net.solosky.litefetion;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import net.solosky.litefetion.bean.ActionResult;
 import net.solosky.litefetion.bean.Buddy;
 import net.solosky.litefetion.bean.BuddyState;
 import net.solosky.litefetion.bean.ClientState;
+import net.solosky.litefetion.bean.Cord;
 import net.solosky.litefetion.bean.Presence;
 import net.solosky.litefetion.bean.Relation;
 import net.solosky.litefetion.bean.Settings;
@@ -83,6 +88,11 @@ public class LiteFetion
 	private ArrayList<Buddy> buddyList;
 	
 	/**
+	 * 分组列表
+	 */
+	private ArrayList<Cord> cordList;
+	
+	/**
 	 * 客户端状态
 	 */
 	private volatile ClientState clientState;
@@ -115,6 +125,7 @@ public class LiteFetion
 		this.client = new HttpClient();
 		this.user = new User();
 		this.buddyList = new ArrayList<Buddy>();
+		this.cordList = new ArrayList<Cord>();
 		this.clientState = ClientState.NEW;
 		this.requestVersion = 0;
 		this.pollNotifyFailed = 0;
@@ -129,9 +140,7 @@ public class LiteFetion
 	 * @param password		密码
 	 * @param presence		登录状态
 	 * @param verifyImage	验证码，登录的过程需要验证码
-	 * @return
-	 * @throws JSONException 
-	 * @throws IOException 
+	 * @return				操作结果
 	 */
 	public ActionResult login(String account, String password, 
 			Presence presence, VerifyImage verifyImage){
@@ -166,10 +175,9 @@ public class LiteFetion
 	
 	/**
 	 * 退出登录
-	 * @return
-	 * @throws IOException 
+	 * @return		操作结果
 	 */
-	public ActionResult logout() throws IOException {
+	public ActionResult logout(){
 		this.signOut();
 		return ActionResult.SUCCESS;
 	}
@@ -177,14 +185,15 @@ public class LiteFetion
 	/**
 	 * 获取验证码图片
 	 * @param type			验证码类型，也就是验证图片的sessionId， 定义在VerifyImage.TYPE_*
-	 * @return				验证码
+	 * @return				验证码，如果失败返回null
 	 */
-	public VerifyImage fetchVerifyImage(String type){
+	public VerifyImage retireVerifyImage(String type){
 		try {
 	        String picurl = StringHelper.format(Settings.WEBIM_URL_GET_PIC, type);
 	        HttpRequest request = this.createHttpRequest(picurl, "GET");
 	        HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
 	        VerifyImage image = new VerifyImage();
+	        image.setVerifyType(type);
 	        image.setImageData(response.getResponseData());
 	        image.setSessionId(this.client.getCookie(type).getValue());
 	        return image;
@@ -200,7 +209,7 @@ public class LiteFetion
 	 * @param method	方法
 	 * @return
 	 */
-	public HttpRequest createHttpRequest(String url, String method) {
+	private HttpRequest createHttpRequest(String url, String method) {
 		HttpRequest request = new HttpRequest(url, method);
 		request.addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10 (.NET CLR 3.5.30729)");
 		request.addHeader("Accept", "image/png,image/*;q=0.8,*/*;q=0.5");
@@ -212,7 +221,7 @@ public class LiteFetion
 	 * @param url
 	 * @return
 	 */
-	public HttpRequest createActionHttpRequest(String url) {
+	private HttpRequest createActionHttpRequest(String url) {
 		url = StringHelper.format(url, this.nextRequestVersion());
 		HttpRequest request = this.createHttpRequest(url, "POST");
 		request.addPostValue("ssid", this.sessionId);
@@ -231,8 +240,6 @@ public class LiteFetion
 	/**
 	 * 登录入口登录,完成主页面登录请求
 	 * @return
-	 * @throws IOException 
-	 * @throws JSONException 
 	 */
 	private ActionResult signIn(String account, String password, 
 			Presence presence , VerifyImage verifyImage)
@@ -275,7 +282,6 @@ public class LiteFetion
 	/**
 	 * 退出登录，完成主页面退出请求
 	 * @return
-	 * @throws IOException 
 	 */
 	private ActionResult signOut()
 	{
@@ -322,8 +328,6 @@ public class LiteFetion
 	
 	/**
 	 * 获取个人信息
-	 * @throws IOException
-	 * @throws JSONException
 	 */
 	private ActionResult retirePersonalInfo()
 	{
@@ -356,9 +360,7 @@ public class LiteFetion
 	
 	/**
 	 * 获取好友的列表
-	 * @return
-	 * @throws JSONException
-	 * @throws IOException
+	 * @return		返回操作结果
 	 */
 	private ActionResult retireBuddyList()
 	{
@@ -369,6 +371,7 @@ public class LiteFetion
 	        if(json.getInt("rc")==200) {
 	        	json = json.getJSONObject("rv");
 	        	//好友列表
+	        	this.buddyList.clear();
 	        	JSONArray buddies = json.getJSONArray("bds");
 	        	for(int i=0;i<buddies.length(); i++) {
 	        		JSONObject jo = buddies.getJSONObject(i);
@@ -382,7 +385,17 @@ public class LiteFetion
 	        		this.buddyList.add(buddy);
 	        	}
 	        	
-	        	//TODO ..分组列表，暂时不处理...
+	        	//分组列表
+	        	this.cordList.clear();
+	        	JSONArray cords = json.getJSONArray("bl");
+	        	for(int i=0; i<cords.length(); i++) {
+	        		JSONObject jo = cords.getJSONObject(i);
+	        		Cord cord = new Cord();
+	        		cord.setId(jo.getInt("id"));
+	        		cord.setTitle(jo.getString("n"));
+	        		
+	        		this.cordList.add(cord);
+	        	}
 	        	
 	        	return ActionResult.SUCCESS;
 	        }else {
@@ -401,8 +414,6 @@ public class LiteFetion
 	 * @param message	消息内容
 	 * @param isSendSMS	是否发送短信		
 	 * @return 			操作结果
-	 * @throws IOException 
-	 * @throws JSONException 
 	 */
 	public ActionResult sendMessage(Buddy buddy, String message, boolean isSendSMS)
 	{
@@ -428,10 +439,20 @@ public class LiteFetion
         }
 	}
 	
+	
+	/**
+	 * 给自己发送短信
+	 * @param message		消息内容
+	 * @return				操作结果
+	 */
+	public ActionResult sendSelfSMS(String message) {
+		return this.sendMessage(this.getUser(), message, true);
+	}
+	
 	/**
 	 * 设置心情短语
 	 * @param impresa	心情短语
-	 * @return
+	 * @return			操作结果
 	 */
 	public ActionResult setImpresa(String impresa) {
         try {
@@ -460,7 +481,7 @@ public class LiteFetion
 	 * 设置状态
 	 * @param presence		状态:ONLINE, AWAY, BUSY, OFFLINE(HIDDEN)
 	 * @param custom		对这个状态的自定义说明，比如当状态为AWAY时，状态的说明可以是 "我吃饭去啦~"
-	 * @return
+	 * @return				操作结果
 	 */
 	public ActionResult setPresence(Presence presence, String custom) {
 		try {
@@ -490,22 +511,26 @@ public class LiteFetion
 	 * @param account			飞信号或者手机号
 	 * @param desc				对自己的说明(我是{$desc})
 	 * @param localName			设置显示本地姓名
-	 * @param verifyImage		验证码
-	 * @return
+	 * @param cord				所属分组，如果为null添加到默认分组
+	 * @param verifyImage		验证码，验证码的类型为VerifyImage.TYPE_ADD_BUDDY，需要首先获取
+	 * @return					操作结果
 	 */
-	public ActionResult addBuddy(String account, String desc, String localName, VerifyImage verifyImage) {
+	public ActionResult addBuddy(String account, String desc, String localName, Cord cord, VerifyImage verifyImage) {
 		try {
 	        HttpRequest request = this.createActionHttpRequest(Settings.WEBIM_URL_ADD_BUDDY);
-	        request.addPostValue("AddType", account.length()==11?"1":"0");
+	        request.addPostValue("AddType", account.length()==11?"1":"0");		//手机号为1,飞信号为0
 	        request.addPostValue("UserName", account);
 	        request.addPostValue("Desc", desc==null?"":desc);
 	        request.addPostValue("LocalName", localName==null?"":localName);
 	        request.addPostValue("Ccp", verifyImage.getVerifyCode());
 	        request.addPostValue("CcpId", verifyImage.getSessionId());
 
-	        request.addPostValue("BuddyLists", "");
+	        request.addPostValue("BuddyLists", cord==null?"0":Integer.toString(cord.getId()));
 	        request.addPostValue("PhraseId", "0");
 	        request.addPostValue("SubscribeFlag", "0");
+	        
+	        this.client.removeCookie(VerifyImage.TYPE_ADD_BUDDY);
+	        
 	        HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
 	        JSONObject json = new JSONObject(response.getResponseString());
 	        int status = json.getInt("rc");
@@ -515,9 +540,9 @@ public class LiteFetion
         		Buddy buddy = new Buddy();
         		buddy.setUri(jo.getString("uri"));
         		buddy.setUserId(jo.getInt("uid"));
-        		buddy.setBlack(jo.getInt("isBk")==0);
+        		buddy.setBlack(false);
         		buddy.setLocalName(jo.getString("ln"));
-        		buddy.setRelation(Relation.valueOf(jo.getInt("rs")));
+        		buddy.setRelation(Relation.UNCONFIRMED);
         		
         		this.buddyList.add(buddy);
         		
@@ -529,6 +554,7 @@ public class LiteFetion
 	        }else if(status==521) {
 	        	return ActionResult.BUDDY_EXISTS;		//已经在好友列表中
 	        }else {
+	        	logger.debug("addBuddy failed, unkown status:"+status);
 	        	return ActionResult.REQUEST_FAILED;
 	        }
         } catch (IOException e) {
@@ -544,15 +570,17 @@ public class LiteFetion
 	 * 处理添加好友的请求
 	 * @param buddy			发起请求的好友
 	 * @param isAgree		是否同意，如果同意，默认添加到默认分组
-	 * @return
+	 * @param localName		如果同意，可以设置本地显示的名字； 如果不同意，直接传递null即可
+	 * @param cord			如果同意，添加好友的分组列表； 如果不同意，直接传递null即可
+	 * @return				操作结果
 	 */
-	public ActionResult handleBuddyApplication(Buddy buddy, boolean isAgree) {
+	public ActionResult handleBuddyApplication(Buddy buddy, boolean isAgree, String localName, Cord cord) {
 		 try {
 		        HttpRequest request = this.createActionHttpRequest(Settings.WEBIM_URL_HANDLE_ADD_BUDDY);
 		        request.addPostValue("BuddyId", Integer.toString(buddy.getUserId()));
 		        request.addPostValue("Result", isAgree?"1":"0");
-		        request.addPostValue("BuddyList", "");
-		        request.addPostValue("LocalName", "");
+		        request.addPostValue("BuddyList", cord==null?"0":Integer.toString(cord.getId()));
+		        request.addPostValue("LocalName", localName==null?"":localName);
 		        HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
 		        JSONObject json = new JSONObject(response.getResponseString());
 		        int status = json.getInt("rc");
@@ -574,6 +602,61 @@ public class LiteFetion
 	         	logger.debug("handleBuddyApplication failed" ,e);
 	        	return ActionResult.REQUEST_FAILED;
 	        }
+	}
+	
+	/**
+	 * 添加好友到黑名单
+	 * @param buddy		好友对象
+	 * @return
+	 */
+	public ActionResult blackBuddy(Buddy buddy) {
+		try {
+		 	HttpRequest request = this.createActionHttpRequest(Settings.WEBIM_URL_OP_BUDDY);
+	        request.addPostValue("Op", "1");
+	        request.addPostValue("To", Integer.toString(buddy.getUserId()));
+	        HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
+	        JSONObject json = new JSONObject(response.getResponseString());
+	        int status = json.getInt("rc");
+	        if(status==200) {
+	        	buddy.setBlack(true);
+	        	return ActionResult.SUCCESS;
+	        }else {
+	        	return ActionResult.REQUEST_FAILED;
+	        }
+	        
+         } catch (IOException e) {
+         	logger.debug("blackBuddy failed" ,e);
+         	return ActionResult.REQUEST_FAILED;
+         } catch (JSONException e) {
+          	logger.debug("BlackBuddy failed" ,e);
+         	return ActionResult.REQUEST_FAILED;
+         }
+	}
+	
+	/**
+	 * 获取好友头像
+	 * @param buddy		好友对象
+	 * @param size		头像大小，可以取1,2,3,4,5,6四个值，不同的值代表不同的头像大小:
+	 * 		 			如下：1=24x24, 2=32x32, 3=64x64, 4=120x120, 5=16x16, 6=48x48
+	 * @return			操作结果，如果成功放入buddy.的portrait属性中
+	 */
+	public ActionResult retirePortrait(Buddy buddy, int size) {
+		try {
+			if(buddy.getCrc()!=null) {
+    	        String url = Settings.WEBIM_URL_GET_PORTRAIT;
+    	        url = StringHelper.format(url, buddy.getUserId(), size, buddy.getCrc(), buddy.getUserId());
+    	        HttpRequest request = this.createHttpRequest(url, "GET");
+    	        HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
+    	        BufferedImage portrait = ImageIO.read(new ByteArrayInputStream(response.getResponseData()));
+    	        buddy.setPortrait(portrait);
+    	        return ActionResult.SUCCESS;
+			}else {
+				return ActionResult.PORTRAIT_NOT_FOUND;
+			}
+        } catch (IOException e) {
+        	logger.warn("retirePortart failed." , e);
+        	return ActionResult.REQUEST_FAILED;
+        }
 	}
 	
 	/**
@@ -641,6 +724,7 @@ public class LiteFetion
     				buddy.setSMSPolicy(data.optString("sms"));
     				buddy.setSid(data.optInt("sid"));
     				buddy.setPresence(data.optInt("pb"));
+    				buddy.setCrc(data.optString("crc"));
     				BuddyState currentState = buddy.getState();
     				logger.debug("BuddyState changed: buddy="+buddy.getDisplayName()+", before="+beforeState+", current="+currentState);
     				return new BuddyStateNotify(beforeState, currentState, buddy);
@@ -690,7 +774,7 @@ public class LiteFetion
 						Relation relation = Relation.valueOf(data.getInt("rs"));
 						buddy.setRelation(relation);
 						logger.debug("Buddy confirmed application: buddy="+buddy+", isAgreed="+(relation==Relation.DECLINED));
-						return new ApplicationConfirmedNotify(buddy, relation==Relation.DECLINED);
+						return new ApplicationConfirmedNotify(buddy, relation==Relation.BUDDY);
 					}
 				}
 		}
@@ -714,6 +798,14 @@ public class LiteFetion
 	 */
 	public List<Buddy> getBuddyList(){
 		return this.buddyList;
+	}
+	
+	/**
+	 * 返回分组列表
+	 * @return
+	 */
+	public List<Cord> getCordList(){
+		return this.cordList;
 	}
 	
 	/**
@@ -776,6 +868,51 @@ public class LiteFetion
 		}
 		return list;
 	}
+	
+	/**
+	 * 返回指定分组的好友列表
+	 * @param cord		分组对象
+	 * @return
+	 */
+	public List<Buddy> getBuddyListByCord(Cord cord)
+	{
+		ArrayList<Buddy> list = new ArrayList<Buddy>();
+		Iterator<Buddy> it = this.buddyList.iterator();
+		Buddy buddy = null;
+		String [] buddyCordIds = null;
+		while(it.hasNext()) {
+			buddy = it.next();
+			if(buddy.getCordIds()!=null){
+				buddyCordIds = buddy.getCordIds().split(";");
+				for(String cid : buddyCordIds){
+					if(cid.equals(Integer.toString(cord.getId()))){
+						list.add(buddy);
+					}
+				}
+			}
+		}
+		return list;
+	}
+	
+	/**
+	 * 返回没有分组的好友列表，在客户端里就是默认的分组列表中的好友
+	 * @return
+	 */
+    public synchronized List<Buddy> getBuddyListWithoutCord()
+    {
+    	ArrayList<Buddy> list = new ArrayList<Buddy>();
+		Iterator<Buddy> it = this.buddyList.iterator();
+		Buddy buddy = null;
+		String  buddyCordId = null;
+		while(it.hasNext()) {
+			buddy = it.next();
+			buddyCordId = buddy.getCordIds();
+			if(buddyCordId==null || buddyCordId.length()==0) {
+				list.add(buddy);
+			}
+		}
+		return list;
+    }
 	
 	//////////////////////////////////好友列表查询结束///////////////////////////////
 }

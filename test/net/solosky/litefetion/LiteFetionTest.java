@@ -34,6 +34,8 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import org.json.JSONException;
 
 import net.solosky.litefetion.bean.ActionResult;
@@ -88,14 +90,10 @@ public class LiteFetionTest extends TestCase
 		final LiteFetion client = new LiteFetion();
 		
 		//首先获取登录验证码
-		VerifyImage image = client.fetchVerifyImage(VerifyImage.TYPE_LOGIN);
-		OutputStream out = new FileOutputStream(new File("v.jpg"));
-		out.write(image.getImageData());
-		out.close();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		System.out.print("请输入登录验证码>>");
-		image.setVerifyCode(reader.readLine());
-		
+		VerifyImage image = client.retireVerifyImage(VerifyImage.TYPE_LOGIN);
+		VerifyDialog dialog = new VerifyDialog(image, client);
+		dialog.setVisible(true);
+		image = dialog.waitOK();
 		//执行登录
 		ActionResult r = client.login("15982070573","xu1234", Presence.AWAY, image);
 		System.out.println("LoginReulst:"+r.toString());
@@ -107,7 +105,7 @@ public class LiteFetionTest extends TestCase
 			}
 			
 			//尝试给自己发送消息
-			System.out.println("SendSMStoSelf:"+client.sendMessage(client.getUser(),"GOODD", true));
+			//System.out.println("SendSMStoSelf:"+client.sendMessage(client.getUser(),"GOODD", true));
 			
 			//设置心情短语
 			System.out.println("SetImpresa:"+client.setImpresa("ABDEE"));
@@ -116,13 +114,23 @@ public class LiteFetionTest extends TestCase
 			System.out.println("SetPresence:"+client.setPresence(Presence.AWAY, "我吃饭去了~~~"));
 			
 			//添加好友
-			VerifyImage vc = client.fetchVerifyImage(VerifyImage.TYPE_ADD_BUDDY);
-			OutputStream out2 = new FileOutputStream(new File("v.jpg"));
-			out2.write(vc.getImageData());
-			out2.close();
-			System.out.print("请输入添加好友验证码>>");
-			vc.setVerifyCode(reader.readLine());
-			System.out.println("AddBuddy:"+client.addBuddy("13880918689", "XXX", "Good", vc ));
+			VerifyImage vc =null;// client.fetchVerifyImage(VerifyImage.TYPE_ADD_BUDDY);
+//			dialog = new VerifyDialog(vc, client);
+//			dialog.setVisible(true);
+//			vc = dialog.waitOK();
+			//System.out.println("AddBuddy:"+client.addBuddy("13880918643", "XXX", "峰子", null ,vc ));
+			
+			
+			Buddy testBuddy = client.getBuddyByUserId(335284404);
+			
+			//加入黑名单
+			//System.out.println("BlackBuddy:"+client.blackBuddy(testBuddy));
+			
+			//获取头像
+			System.out.println("RetirePortrait:"+client.retirePortrait(testBuddy, 4));
+			if(testBuddy.getPortrait()!=null) {
+				ImageIO.write(testBuddy.getPortrait(), "JPG", new File("portrait-"+testBuddy.getUserId()+".jpg"));
+			}
 			
 			//启动类似于windows的消息循环，获取服务器发送的通知，比如好友在线状态，接受消息等...
 			boolean isLogout = false;
@@ -157,12 +165,20 @@ public class LiteFetionTest extends TestCase
 						case BUDDY_APPLICATION:
 							BuddyApplicationNotify an = (BuddyApplicationNotify) notify;
 							System.out.println("收到了好友请求:buddy="+an.getBuddy().getDisplayName()+", 说明:"+an.getDesc());
-							System.out.println("自动同意添加好友请求:"+client.handleBuddyApplication(an.getBuddy(), true));
+							System.out.println("自动同意添加好友请求:"+client.handleBuddyApplication(an.getBuddy(), true, null, null));
 							break;
 							
 						case APPLICATION_CONFIRMED:
 							ApplicationConfirmedNotify fn = (ApplicationConfirmedNotify) notify;
 							System.out.println("收到添加好友的回复："+fn.getBuddy().getDisplayName()+" "+(fn.isAgreed()?"同意":"拒绝")+"了你添加好友的请求。");
+							
+							if(!fn.isAgreed()) {
+								vc = client.retireVerifyImage(VerifyImage.TYPE_ADD_BUDDY);
+								dialog = new VerifyDialog(vc, client);
+								dialog.setVisible(true);
+								vc = dialog.waitOK();
+								System.out.println("未同意添加好友请求，重新发起添加好友请求："+client.addBuddy(""+fn.getBuddy().getMobile(), "xxx", null, null, vc));
+							}
 							break;
 								
 					}

@@ -25,6 +25,8 @@
  */
 package net.solosky.litefetion.bean;
 
+import java.awt.image.BufferedImage;
+
 /**
  *
  * 飞信好友
@@ -45,6 +47,8 @@ public class Buddy
 	private Presence presense;
 	private String impresa;
 	private SMSPolicy smsPolicy;
+	private BufferedImage portrait;
+	private String crc;
 	
 	public Buddy() {
 		this.smsPolicy = new SMSPolicy();
@@ -128,6 +132,22 @@ public class Buddy
 		return this.relation == Relation.BUDDY;
 	}
 	
+	public BufferedImage getPortrait() {
+    	return portrait;
+    }
+
+	public void setPortrait(BufferedImage portrait) {
+    	this.portrait = portrait;
+    }
+	
+	public String getCrc() {
+    	return crc;
+    }
+
+	public void setCrc(String crc) {
+    	this.crc = crc;
+    }
+
 	public BuddyState getState() {
 		BuddyState state = BuddyState.OFFLINE;
 		if(this.getRelation()==Relation.BUDDY) {
