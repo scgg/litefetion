@@ -212,7 +212,10 @@ public class LiteFetion
 	private HttpRequest createHttpRequest(String url, String method) {
 		HttpRequest request = new HttpRequest(url, method);
 		request.addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.10) Gecko/20100914 Firefox/3.6.10 (.NET CLR 3.5.30729)");
-		request.addHeader("Accept", "image/png,image/*;q=0.8,*/*;q=0.5");
+		request.addHeader("Accept", "text/html,application/xhtml+xml,application/xml,image/png,image/*;q=0.9,*/*;q=0.8");
+		request.addHeader("Accept-Language", "en-us,en;q=0.5");
+		request.addHeader("Accept-Encoding", "gzip,deflate");
+		request.addHeader("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
 		return request;
 	}
 	
@@ -380,6 +383,7 @@ public class LiteFetion
 	        		buddy.setUserId(jo.getInt("uid"));
 	        		buddy.setBlack(jo.getInt("isBk")==0);
 	        		buddy.setLocalName(jo.getString("ln"));
+	        		buddy.setCordIds(jo.getString("bl"));
 	        		buddy.setRelation(Relation.valueOf(jo.getInt("rs")));
 	        		
 	        		this.buddyList.add(buddy);
@@ -637,11 +641,12 @@ public class LiteFetion
 	 * 获取好友头像
 	 * @param buddy		好友对象
 	 * @param size		头像大小，可以取1,2,3,4,5,6四个值，不同的值代表不同的头像大小:
-	 * 		 			如下：1=24x24, 2=32x32, 3=64x64, 4=120x120, 5=16x16, 6=48x48
+	 * 		 			如下：1=24x24, 2=32x32, 3=64x64, 4=96x96, 5=16x16, 6=48x48
 	 * @return			操作结果，如果成功放入buddy.的portrait属性中
 	 */
 	public ActionResult retirePortrait(Buddy buddy, int size) {
 		try {
+			if(size<1 || size>6)	throw new IllegalArgumentException("size should be those values:{1,2,3,4,5,6}") ;
 			if(buddy.getCrc()!=null) {
     	        String url = Settings.WEBIM_URL_GET_PORTRAIT;
     	        url = StringHelper.format(url, buddy.getUserId(), size, buddy.getCrc(), buddy.getUserId());

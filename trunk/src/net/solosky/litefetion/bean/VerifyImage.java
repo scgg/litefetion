@@ -33,14 +33,34 @@ package net.solosky.litefetion.bean;
  */
 public class VerifyImage
 {
-	
+	/**
+	 * 登录的验证图片
+	 */
 	public static final String TYPE_LOGIN = "ccpsession";
+	
+	/**
+	 * 添加好友的验证图片
+	 */
 	public static final String TYPE_ADD_BUDDY = "addbuddy_ccpsession";
 	
-	
+	/**
+	 * 用户输入的验证码
+	 */
 	private String verifyCode;
+	
+	/**
+	 * 原始的验证图片数据
+	 */
 	private byte[] imageData;
+	
+	/**
+	 * 这个验证图片对应的验证图片ID
+	 */
 	private String sessionId;
+	
+	/**
+	 * 验证类型，VerifyImage.TYPE_LOGIN or VerifyImage.TYPE_ADD_BUDDY
+	 */
 	private String verifyType;
 	
 	

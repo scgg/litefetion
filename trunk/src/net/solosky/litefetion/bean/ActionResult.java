@@ -33,17 +33,51 @@ package net.solosky.litefetion.bean;
  */
 public enum ActionResult {
 	
-	SUCCESS(200),				//成功
-	BUDDY_EXISTS(410),			//好友已经存在
-	VERIFY_FAILED(420),			//验证码验证失败
-	REQUEST_FAILED(430),		//请求失败，一般是网络问题或者服务器出了问题
-	PORTRAIT_NOT_FOUND(510),	//头像不存在
+	/**
+	 * 操作成功
+	 */
+	SUCCESS(200),
+	
+	/**
+	 * 好友已经存在
+	 */
+	BUDDY_EXISTS(410),	
+	
+	/**
+	 * 验证码验证失败
+	 */
+	VERIFY_FAILED(420),	
+	
+	/**
+	 * 请求失败，一般是网络问题或者服务器出了问题
+	 */
+	REQUEST_FAILED(430),
+	
+	/**
+	 * 头像不存在
+	 */
+	PORTRAIT_NOT_FOUND(510),
 	
 	/*登录出错*/
-	USER_INVALID(700),			//账号无效
-	PASSWORD_NOT_MATCH(701),	//密码错误
-	USER_SUSPEND(702),			//已经欠费
-	USER_NOT_FOUND(703),		//未开通飞信
+	/**
+	 * 账号无效
+	 */
+	USER_INVALID(700),
+	
+	/**
+	 * 密码错误
+	 */
+	PASSWORD_NOT_MATCH(701),
+	
+	/**
+	 * 已经欠费
+	 */
+	USER_SUSPEND(702),
+	
+	/**
+	 * 未开通飞信
+	 */
+	USER_NOT_FOUND(703),	
 	
 	;
 	

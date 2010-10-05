@@ -32,11 +32,38 @@ package net.solosky.litefetion.bean;
  * @author solosky <solosky772@qq.com>
  */
 public enum ClientState {
-	NEW,				//刚刚建立没有执行过登录过程
-	LOGGING,			//正在登录
-	LOGIN_FAIL,			//登录失败
-	ONLINE,				//在线
-	NET_ERROR,			//网络出错，或者服务器连接不上
-	OTHER_LOGIN,		//从其他客户端登录
-	LOGOUT,				//已经成功退出
+	/**
+	 * 刚刚建立没有执行过登录过程
+	 */
+	NEW,
+	
+	/**
+	 * 正在登录
+	 */
+	LOGGING,
+	
+	/**
+	 * 登录失败
+	 */
+	LOGIN_FAIL,	
+	
+	/**
+	 * 在线
+	 */
+	ONLINE,
+	
+	/**
+	 * 网络出错，或者服务器连接不上
+	 */
+	NET_ERROR,
+	
+	/**
+	 * 从其他客户端登录
+	 */
+	OTHER_LOGIN,
+	
+	/**
+	 * 已经成功退出
+	 */
+	LOGOUT,
 }

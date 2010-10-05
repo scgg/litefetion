@@ -35,19 +35,74 @@ import java.awt.image.BufferedImage;
  */
 public class Buddy
 {
+	/**
+	 * 用户ID，唯一的标识符
+	 */
 	private int userId;
+	
+	/**
+	 * URI，没有实际的含义，也可以标识一个用户
+	 */
 	private String uri;
+	
+	/**
+	 * 飞信号，仅在开通飞信的时候有效
+	 */
 	private int sid;
+	
+	/**
+	 * 分组编号，可以有多个分组编号，用；隔开
+	 */
 	private String cordIds;
+	
+	/**
+	 * 用户设置的好友的备注
+	 */
 	private String localName;
+	
+	/**
+	 * 昵称
+	 */
 	private String nickName;
+	
+	/**
+	 * 是否在黑名单中
+	 */
 	private boolean isBlack;
+	
+	/**
+	 * 该好友和用户的关系
+	 */
 	private Relation relation;
+	
+	/**
+	 * 手机号，权限关系，不一定有效
+	 */
 	private long mobile;
+	
+	/**
+	 * 在线状态
+	 */
 	private Presence presense;
+	
+	/**
+	 * 心情短语
+	 */
 	private String impresa;
+	
+	/**
+	 * 定义为在某段时间内不把飞信发送到手机上
+	 */
 	private SMSPolicy smsPolicy;
+	
+	/**
+	 * 头像，默认为空，需要手动获取
+	 */
 	private BufferedImage portrait;
+	
+	/**
+	 * 头像的crc校验码
+	 */
 	private String crc;
 	
 	public Buddy() {
@@ -64,8 +119,16 @@ public class Buddy
 	public String getUri() {
     	return uri;
     }
-	public void setUri(String uri) {
-    	this.uri = uri;
+    public void setUri(String uri)
+    {
+    	this.uri = uri.trim();
+    	if(uri.startsWith("sip")) {
+    		this.sid = Integer.parseInt(uri.substring(4, (uri.indexOf('@')==-1?uri.length()-1:uri.indexOf('@'))));
+    	}else if(uri.startsWith("tel")){
+    		this.mobile = Long.parseLong(uri.substring(4));
+    	}else {
+    		throw new IllegalArgumentException("Illegal uri:"+uri);
+    	}
     }
 	public int getSid() {
     	return sid;
@@ -172,7 +235,7 @@ public class Buddy
     		return getNickName();
     	if(getSid()>0)
     		return Integer.toString(getSid());
-    	if(getMobile()!=0)
+    	if(getMobile()>0)
     		return Long.toString(getMobile());
     	return Integer.toString(getUserId());
     }

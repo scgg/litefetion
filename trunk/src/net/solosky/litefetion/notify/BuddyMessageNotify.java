@@ -36,9 +36,19 @@ import net.solosky.litefetion.bean.Buddy;
  */
 public class BuddyMessageNotify extends Notify
 {
-
+	/**
+	 * 发送消息的好友
+	 */
 	private Buddy buddy;
+	
+	/**
+	 * 消息内容
+	 */
 	private String message;
+	
+	/**
+	 * 发送的时间
+	 */
 	private Date sendDate;
 	
 	/**

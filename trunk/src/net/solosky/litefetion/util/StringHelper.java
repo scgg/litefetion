@@ -16,11 +16,11 @@
  */
 
  /**
- * Project  : MapleFetion2
- * Package  : net.solosky.maplefetion.util
+ * Project  : LiteFetion
+ * Package  : net.solosky.litefetion.util
  * File     : StringHelper.java
  * Author   : solosky < solosky772@qq.com >
- * Created  : StringHelper.java
+ * Created  : 2010-10-3
  * License  : Apache License 2.0 
  */
 package net.solosky.litefetion.util;

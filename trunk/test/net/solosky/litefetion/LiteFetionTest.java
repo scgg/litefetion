@@ -25,23 +25,16 @@
  */
 package net.solosky.litefetion;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.json.JSONException;
-
 import net.solosky.litefetion.bean.ActionResult;
 import net.solosky.litefetion.bean.Buddy;
-import net.solosky.litefetion.bean.BuddyState;
 import net.solosky.litefetion.bean.ClientState;
+import net.solosky.litefetion.bean.Cord;
 import net.solosky.litefetion.bean.Presence;
 import net.solosky.litefetion.bean.VerifyImage;
 import net.solosky.litefetion.notify.ApplicationConfirmedNotify;
@@ -50,42 +43,14 @@ import net.solosky.litefetion.notify.BuddyMessageNotify;
 import net.solosky.litefetion.notify.BuddyStateNotify;
 import net.solosky.litefetion.notify.ClientStateNotify;
 import net.solosky.litefetion.notify.Notify;
-import junit.framework.TestCase;
 
 /**
  *
  *
  * @author solosky <solosky772@qq.com>
  */
-public class LiteFetionTest extends TestCase
+public class LiteFetionTest
 {
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
-	/**
-	 * Test method for {@link net.solosky.litefetion.LiteFetion#login(java.lang.String, java.lang.String, net.solosky.litefetion.bean.VerifyImage)}.
-	 * @throws Exception 
-	 * @throws IOException 
-	 * @throws JSONException 
-	 * @throws InterruptedException 
-	 */
-	public void testLogin() throws Exception{
-		main(null);
-	}
-
-	
 	public static void main(String [] arg) throws Exception {
 		final LiteFetion client = new LiteFetion();
 		
@@ -95,17 +60,56 @@ public class LiteFetionTest extends TestCase
 		dialog.setVisible(true);
 		image = dialog.waitOK();
 		//执行登录
-		ActionResult r = client.login("15982070573","xu1234", Presence.AWAY, image);
+		ActionResult r = client.login("15912345678","1234", Presence.AWAY, image);
 		System.out.println("LoginReulst:"+r.toString());
 		if(r==ActionResult.SUCCESS) {
-			Iterator<Buddy> it = client.getBuddyList().iterator();
-			System.out.println("-------------BuddyList------------------");
-			while(it.hasNext()) {
-				System.out.println(it.next());
+			
+			//默认分组
+			Iterator<Buddy> bit = client.getBuddyListWithoutCord().iterator();
+			System.out.println("-------------[ 默认分组 ]------------------");
+			while(bit.hasNext()) {
+				System.out.println(bit.next());
+				
 			}
 			
+			//其他分组
+			Iterator<Cord> cit = client.getCordList().iterator();
+			while(cit.hasNext()) {
+				Cord cord = cit.next();
+				System.out.println("----------["+cord.getId()+"::"+cord.getTitle()+"]------------");
+				
+				bit = client.getBuddyListByCord(cord).iterator();
+				while(bit.hasNext()) {
+					System.out.println(bit.next());
+				}
+			}
+			
+			//陌生人
+			bit = client.getStrangerList().iterator();
+			System.out.println("-------------[ 陌生人 ]------------------");
+			while(bit.hasNext()) {
+				System.out.println(bit.next());
+				
+			}
+			
+			//黑名单
+			bit = client.getBlackList().iterator();
+			System.out.println("-------------[ 黑名单 ]------------------");
+			while(bit.hasNext()) {
+				System.out.println(bit.next());
+				
+			}
+			
+			Buddy testBuddy = client.getBuddyByUserId(335284404);
+			
 			//尝试给自己发送消息
-			//System.out.println("SendSMStoSelf:"+client.sendMessage(client.getUser(),"GOODD", true));
+			System.out.println("SendSMStoSelf:"+client.sendSelfSMS("来自LiteFetion的短信"));
+			
+			//给好友发送飞信
+			System.out.println("SendMessage:"+client.sendMessage(testBuddy, "来自LiteFetion的飞信。", false));
+			
+			//给好友发送短信
+			System.out.println("SendSMS:"+client.sendMessage(testBuddy, "来自LiteFetion的短信。", true));
 			
 			//设置心情短语
 			System.out.println("SetImpresa:"+client.setImpresa("ABDEE"));
@@ -114,17 +118,15 @@ public class LiteFetionTest extends TestCase
 			System.out.println("SetPresence:"+client.setPresence(Presence.AWAY, "我吃饭去了~~~"));
 			
 			//添加好友
-			VerifyImage vc =null;// client.fetchVerifyImage(VerifyImage.TYPE_ADD_BUDDY);
-//			dialog = new VerifyDialog(vc, client);
-//			dialog.setVisible(true);
-//			vc = dialog.waitOK();
-			//System.out.println("AddBuddy:"+client.addBuddy("13880918643", "XXX", "峰子", null ,vc ));
+			VerifyImage vc = client.retireVerifyImage(VerifyImage.TYPE_ADD_BUDDY);
+			dialog = new VerifyDialog(vc, client);
+			dialog.setVisible(true);
+			vc = dialog.waitOK();
+			System.out.println("AddBuddy:"+client.addBuddy("13887654321`", "小牛", "峰子", null ,vc ));
 			
-			
-			Buddy testBuddy = client.getBuddyByUserId(335284404);
 			
 			//加入黑名单
-			//System.out.println("BlackBuddy:"+client.blackBuddy(testBuddy));
+			System.out.println("BlackBuddy:"+client.blackBuddy(testBuddy));
 			
 			//获取头像
 			System.out.println("RetirePortrait:"+client.retirePortrait(testBuddy, 4));

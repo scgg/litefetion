@@ -36,8 +36,19 @@ import net.solosky.litefetion.bean.BuddyState;
 public class BuddyStateNotify extends Notify
 {
 
+	/**
+	 * 之前的状态
+	 */
 	private BuddyState beforeState;
+	
+	/**
+	 * 现在的状态
+	 */
 	private BuddyState currentState;
+	
+	/**
+	 * 好友对象
+	 */
 	private Buddy buddy;
 	
 	
