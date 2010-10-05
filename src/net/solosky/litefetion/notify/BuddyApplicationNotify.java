@@ -35,7 +35,14 @@ import net.solosky.litefetion.bean.Buddy;
  */
 public class BuddyApplicationNotify extends Notify
 {
+	/**
+	 * 请求添加用户为好友的对象
+	 */
 	private Buddy buddy;
+	
+	/**
+	 * 说明,我是 xxx
+	 */
 	private String desc;
 	
 	/**

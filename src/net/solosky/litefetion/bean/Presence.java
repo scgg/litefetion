@@ -32,11 +32,30 @@ package net.solosky.litefetion.bean;
  * @author solosky <solosky772@qq.com>
  */
 public enum Presence {
-	OFFLINE(0),			//离线
-	ONLINE(400),		//客户端在线
-	BUSY(600),			//忙碌
-	AWAY(100),			//离开
-	ROBOT(499);			//机器人在线
+	/**
+	 * 离线
+	 */
+	OFFLINE(0),	
+	
+	/**
+	 * 客户端在线
+	 */
+	ONLINE(400),
+	
+	/**
+	 * 忙碌
+	 */
+	BUSY(600),
+	
+	/**
+	 * 离开
+	 */
+	AWAY(100),
+	
+	/**
+	 * 机器人在线
+	 */
+	ROBOT(499);	
 	
 	int value;
 	Presence(int value){

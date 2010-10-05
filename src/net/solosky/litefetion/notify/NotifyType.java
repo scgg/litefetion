@@ -31,10 +31,30 @@ package net.solosky.litefetion.notify;
  * @author solosky <solosky772@qq.com>
  */
 public enum NotifyType {
-	CLIENT_STATE,		//客户端状态
-	BUDDY_MESSAGE,		//好友消息
-	BUDDY_STATE,		//好友状态
-	BUDDY_APPLICATION,	//添加好友请求
-	APPLICATION_CONFIRMED,//对方回复了添加好友的请求
+	/**
+	 * 客户端状态
+	 */
+	CLIENT_STATE,
+	
+	/**
+	 * 好友消息
+	 */
+	BUDDY_MESSAGE,
+	
+	/**
+	 * 好友状态
+	 */
+	BUDDY_STATE,
+	
+	/**
+	 * 添加好友请求
+	 */
+	BUDDY_APPLICATION,
+	
+	/**
+	 * 对方回复了添加好友的请求
+	 */
+	APPLICATION_CONFIRMED,
+	
 	//TODO ..其他待添加
 }

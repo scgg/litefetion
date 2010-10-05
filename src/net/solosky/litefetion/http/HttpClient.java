@@ -222,22 +222,4 @@ public class HttpClient
 	{
 		return this.cookieList;
 	}
-	
-	/**
-	 * 
-	 * @param args
-	 * @throws IOException
-	 */
-	
-	public static void main(String[] args) throws IOException {
-		//System.out.println(new Cookie("ptvfsession=def29cf951523c08b0781d128a255877b9581cef7dd3794e55cee7d7c60ac650b57a86e54066997ae4227eb1c1394ce0; PATH=/; DOMAIN=ptlogin2.qq.com;"));
-		HttpClient client = new HttpClient();
-		HttpRequest request = new HttpRequest("https://webim.feixin.10086.cn/WebIM/GetPicCode.aspx?Type=ccpsession&0.4515483724734014", "GET");
-		HttpResponse response = client.execute(request);
-		System.out.println(response);
-		System.out.println(client.getCookie("ptvfsession"));
-		System.out.println(client.getCookieList());
-		System.out.println("sss");
-		
-	}
 }

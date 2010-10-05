@@ -34,7 +34,14 @@ import net.solosky.litefetion.bean.Buddy;
  */
 public class ApplicationConfirmedNotify extends Notify
 {
+	/**
+	 * 添加的好友
+	 */
 	private Buddy buddy;
+	
+	/**
+	 * 是否同意
+	 */
 	private boolean isAgreed;
 	
 	/**

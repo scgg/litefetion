@@ -32,13 +32,40 @@ package net.solosky.litefetion.bean;
  * @author solosky <solosky772@qq.com>
  */
 public enum BuddyState {
-	OFFLINE,		//离线
-	ONLINE,			//客户端在线
-	BUSY,			//忙碌
-	AWAY,			//离开
-	ROBOT,			//机器人在线
-	CLOSED,			//关闭飞信服务
-	SMS;			//短信在线
+	/**
+	 * 离线
+	 */
+	OFFLINE,
+	
+	/**
+	 * 客户端在线
+	 */
+	ONLINE,	
+	
+	/**
+	 * 忙碌
+	 */
+	BUSY,
+	
+	/**
+	 * 离开
+	 */
+	AWAY,
+	
+	/**
+	 * 机器人在线
+	 */
+	ROBOT,
+	
+	/**
+	 * 关闭飞信服务
+	 */
+	CLOSED,	
+	
+	/**
+	 * 短信在线
+	 */
+	SMS;
 	
 	
 	
