@@ -179,6 +179,7 @@ public class LiteFetion
 	 */
 	public ActionResult logout(){
 		this.signOut();
+		this.updateClientState(ClientState.LOGOUT);
 		return ActionResult.SUCCESS;
 	}
 	
