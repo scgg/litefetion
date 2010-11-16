@@ -252,7 +252,9 @@ public class LiteFetion
 	        HttpRequest request = this.createHttpRequest(Settings.WEBIM_URL_LOGIN, "POST");
 	        request.addPostValue("UserName", account);
 	        request.addPostValue("Pwd", password);
-	        request.addPostValue("Ccp", verifyImage.getVerifyCode());
+	        if(verifyImage != null ) {
+		        request.addPostValue("Ccp", verifyImage.getVerifyCode());
+	        }
 	        request.addPostValue("OnlineStatus", Integer.toString(presence.getValue()));
 	        HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
 	        JSONObject json = new JSONObject(response.getResponseString());
@@ -724,13 +726,19 @@ public class LiteFetion
 				buddy = this.getBuddyByUserId(userId);
 				if(buddy!=null) {
 					BuddyState beforeState = buddy.getState();
-    				buddy.setMobile(data.optLong("mn"));
-    				buddy.setNickName(data.optString("nn"));
-    				buddy.setImpresa(data.optString("i"));
-    				buddy.setSMSPolicy(data.optString("sms"));
-    				buddy.setSid(data.optInt("sid"));
+					if(data.optLong("mn") != 0) {
+                        buddy.setMobile(data.optLong("mn"));
+					}    				
+                    if(data.optString("nn")!=null && data.optString("nn").length()>0 ) {
+                        buddy.setNickName(data.optString("nn"));
+                    }    				
+                    buddy.setImpresa(data.optString("i"));
+                    if(data.optString("sms")!=null && data.optString("sms").length()>0 ) {
+        				buddy.setSMSPolicy(data.optString("sms"));
+                    }
+                    buddy.setSid(data.optInt("sid"));
     				buddy.setPresence(data.optInt("pb"));
-    				buddy.setCrc(data.optString("crc"));
+                    buddy.setCrc(data.optString("crc"));
     				BuddyState currentState = buddy.getState();
     				logger.debug("BuddyState changed: buddy="+buddy.getDisplayName()+", before="+beforeState+", current="+currentState);
     				return new BuddyStateNotify(beforeState, currentState, buddy);
