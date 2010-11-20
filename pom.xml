@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.googlecode</groupId>
 	<artifactId>litefetion</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Lite Fetion</name>
@@ -32,9 +32,9 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:svn:http://litefetion.googlecode.com/svn/tags/litefetion-1.0.1</connection>
-		<developerConnection>scm:svn:https://litefetion.googlecode.com/svn/tags/litefetion-1.0.1</developerConnection>
-		<url>http://code.google.com/p/litefetion/source/browse/tags/litefetion-1.0.1</url>
+		<connection>scm:svn:http://litefetion.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://litefetion.googlecode.com/svn/trunk/</developerConnection>
+		<url>http://code.google.com/p/litefetion/source/browse/</url>
 	</scm>
 
 	<issueManagement>
