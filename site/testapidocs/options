@@ -1,0 +1,26 @@
+-classpath
+'/home/echo/projects/litefetion/target/checkout/target/classes:/home/echo/projects/litefetion/target/checkout/target/test-classes:/home/echo/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar:/home/echo/.m2/repository/org/json/json/20090211/json-20090211.jar:/home/echo/.m2/repository/junit/junit/3.8.2/junit-3.8.2.jar'
+-encoding
+'UTF-8'
+-public
+-sourcepath
+'/home/echo/projects/litefetion/target/checkout/src/test/java'
+-author
+-bottom
+'Copyright &#169; 2010 <a href="http://litefetion.googlecode.com/">>LiteFetion</a>. All Rights Reserved.'
+-charset
+'UTF-8'
+-d
+'/home/echo/projects/litefetion/target/checkout/target/site/testapidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'Lite Fetion 1.0.1 Test API'
+-link
+'http://java.sun.com/j2se/1.5/docs/api'
+-link
+'http://java.sun.com/j2se/1.5.0/docs/api'
+-use
+-version
+-windowtitle
+'Lite Fetion 1.0.1 Test API'
