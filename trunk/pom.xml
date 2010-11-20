@@ -8,13 +8,65 @@
 
 	<name>Lite Fetion</name>
 	<description>Lite Fetion</description>
-	<url>hhttp://litefetion.googlecode.com/</url>
+	<url>http://litefetion.googlecode.com/</url>
+
+	<organization>
+		<name>>LiteFetion</name>
+		<url>http://litefetion.googlecode.com/</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
 
 	<scm>
 		<connection>scm:svn:http://litefetion.googlecode.com/svn/trunk/</connection>
 		<developerConnection>scm:svn:https://litefetion.googlecode.com/svn/trunk/</developerConnection>
 		<url>http://code.google.com/p/litefetion/source/browse/</url>
 	</scm>
+
+	<issueManagement>
+		<system>Google Code</system>
+		<url>http://code.google.com/p/litefetion/issues/list</url>
+	</issueManagement>
+
+	<mailingLists>
+		<mailingList>
+			<name>User List</name>
+			<subscribe>litefetion@googlegroups.com</subscribe>
+			<unsubscribe>litefetion+unsubscribe@googlegroups.com</unsubscribe>
+			<post>litefetion@googlegroups.com</post>
+			<archive>http://groups.google.com/group/litefetion/</archive>
+		</mailingList>
+	</mailingLists>
+
+	<repositories>
+		<repository>
+			<id>litefetion-repository</id>
+			<url>http://litefetion.googlecode.com/svn/repository/</url>
+			<name>litefetion Maven Repository</name>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>litefetion-repository</id>
+			<name>Repository for litefetion builds</name>
+			<url>svn:https://litefetion.googlecode.com/svn/repository/</url>
+		</repository>
+		<snapshotRepository>
+			<id>litefetion-snapshot-repository</id>
+			<name>Repository for litefetion snapshot builds</name>
+			<url>svn:https://litefetion.googlecode.com/svn/repository/</url>
+		</snapshotRepository>
+		<site>
+			<id>site</id>
+			<url>svn:https://litefetion.googlecode.com/svn/site/</url>
+		</site>
+	</distributionManagement>
 
 	<dependencies>
 		<dependency>
@@ -78,7 +130,36 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.jvnet.wagon-svn</groupId>
+				<artifactId>wagon-svn</artifactId>
+				<version>1.9</version>
+			</extension>
+		</extensions>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/j2se/1.5/docs/api</link>
+					</links>
+					<show>public</show>
+					<charset>UTF-8</charset>
+					<encoding>UTF-8</encoding>
+					<docencoding>UTF-8</docencoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
 
 </project>
 
