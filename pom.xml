@@ -14,6 +14,16 @@
 		<name>>LiteFetion</name>
 		<url>http://litefetion.googlecode.com/</url>
 	</organization>
+        
+        <developers>
+            <developer>
+            <id>solosky.xu</id>
+            <name>Solosky Xu</name>
+            <email>solosky772@qq.com</email>
+            <url>http://www.solosky.net/</url>
+            </developer>
+        </developers>
+
 
 	<licenses>
 		<license>
