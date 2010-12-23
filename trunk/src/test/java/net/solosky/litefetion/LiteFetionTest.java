@@ -26,6 +26,8 @@
 package net.solosky.litefetion;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -118,7 +120,8 @@ public class LiteFetionTest
 			System.out.println("SetPresence:"+client.setPresence(Presence.AWAY, "我吃饭去了~~~"));
 			
 			//添加好友
-			VerifyImage vc = client.retireVerifyImage(VerifyImage.TYPE_ADD_BUDDY);
+			VerifyImage vc = null;
+			vc = client.retireVerifyImage(VerifyImage.TYPE_ADD_BUDDY);
 			dialog = new VerifyDialog(vc, client);
 			dialog.setVisible(true);
 			vc = dialog.waitOK();
@@ -126,7 +129,7 @@ public class LiteFetionTest
 			
 			
 			//加入黑名单
-			System.out.println("BlackBuddy:"+client.blackBuddy(testBuddy));
+			//System.out.println("BlackBuddy:"+client.blackBuddy(testBuddy));
 			
 			//获取头像
 			System.out.println("RetirePortrait:"+client.retirePortrait(testBuddy, 4));
@@ -134,6 +137,20 @@ public class LiteFetionTest
 				ImageIO.write(testBuddy.getPortrait(), "JPG", new File("portrait-"+testBuddy.getUserId()+".jpg"));
 			}
 			
+			
+			ArrayList<Buddy> toBuddies = new ArrayList<Buddy>();
+			toBuddies.add(client.getUser());
+			toBuddies.add(testBuddy);
+			
+			//批量发送短信
+			System.out.println("BatchSendSMS:"+client.batchSendSMS(toBuddies,"这是来自LiteFetion的批量发送短信。"));
+			//发送定时短信
+			Calendar calMin = Calendar.getInstance();
+			calMin.add(Calendar.MINUTE, 10);	//时间不对。。
+			System.out.println("SendScheduleSMS(Failed):"+client.sendScheduleSMS(toBuddies, "这是来自LiteFetion的定时短信", calMin.getTime()));
+			calMin.add(Calendar.MINUTE, 11);
+			System.out.println("SendScheduleSMS:"+client.sendScheduleSMS(toBuddies, "这是来自LiteFetion的定时短信", calMin.getTime()));
+
 			//启动类似于windows的消息循环，获取服务器发送的通知，比如好友在线状态，接受消息等...
 			boolean isLogout = false;
 			while(!isLogout) {

@@ -51,6 +51,8 @@ public class Settings
 	public static final String WEBIM_URL_HANDLE_ADD_BUDDY = WEBIM_URL_ROOT + "WebIM/HandleAddBuddy.aspx?Version={0}";
 	public static final String WEBIM_URL_GET_PORTRAIT = WEBIM_URL_ROOT + "WebIM/GetPortrait.aspx?did={0}&Size={1}&Crc={2}&mid={3}";
 	public static final String WEBIM_URL_OP_BUDDY = WEBIM_URL_ROOT + "WebIM/OpBuddy.aspx?Version={0}";
+	public static final String WEBIM_URL_SEND_SMS = WEBIM_URL_ROOT + "content/WebIM/SendSMS.aspx?Version={0}";
+	public static final String WEBIM_URL_SET_SCHEDULESMS = WEBIM_URL_ROOT + "content/WebIM/SetScheduleSms.aspx?Version={0}&Type=0";
 	public static final int FEITON_MAX_REQUEST_EXECUTE_TIMES = 3;
 	public static final int FETION_MAX_POLL_NOTIFY_FAILED = 3;
 }
