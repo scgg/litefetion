@@ -10,7 +10,11 @@ LiteFetion使用官方飞信的[https://webim.feixin.10086.cn WebFetion]的通�
 LiteFetion已经完全实现了WebFetion的全部功能，能基本实现常用的操作，是对WebFetion的友好封装。您可以使用LiteFetion将飞信应用嵌入到您的应用程序中，实现发送短信等。 
 做这个项目的目的，是希望大家能充分的利用飞信资源，方便自己应用，但请你们不要使用MapleFetion做一些无聊的事情。
 
-== LiteFetion 1.0.0 特性 ==
+== LiteFetion 动态 ==
+    *  2010.11.23      LiteFetion-1.1.0 发布，新增批量发送短信和发送定时短信接口
+    *  2010.10.05      LiteFetion-1.0.0 发布啦~ 国庆5天的成果哇~
+
+== LiteFetion 1.1.0 特性 ==
 
     # 使用WebFetion的协议
     # 支持使用飞信号或者手机号登陆
@@ -24,6 +28,8 @@ LiteFetion已经完全实现了WebFetion的全部功能，能基本实现常用�
     # 将好友加入黑名单
     # 支持好友分组
     # 完全同的步的操作
+    # 发送定时短信
+    # 批量发送短信
   
 == 接口调用 ==
 由于我比较懒，LiteFetion的接口也很简单，注释也很详尽，就懒得写文档了，不过我写了一个测试文件(在test目录下，LiteFetionTest.java)，里面已经包含了基本上所有的操作的调用方法，可以作为参考。
@@ -39,6 +45,10 @@ MapleFetion. [http://maplefetion.googlecode.com 项目地址]
 或者给我发邮件  ：solosky772@qq.com
 
 欢迎大家测试并提出改进意见，我会倾听大家的建议和反馈，做最好的飞信开发库。
+
+== 衷心感谢 ==
+感谢以下网友为LiteFetion提供的反馈和建议：
+amon, amon.lei, code@didikeke.com...
 
 
 == 重要声明 ==

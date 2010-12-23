@@ -279,11 +279,9 @@ public class LiteFetion
 	        	return ActionResult.REQUEST_FAILED;
 	        }
         } catch (IOException e) {
-        	logger.warn("signIn failed." ,e);
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	logger.warn("signIn failed." ,e);
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -299,14 +297,12 @@ public class LiteFetion
 	        JSONObject json = new JSONObject(response.getResponseString());
 	        int status =  json.getInt("rc");
 	        return status==200 ? ActionResult.SUCCESS : ActionResult.REQUEST_FAILED;
-        } catch (IOException e) {
-        	logger.warn("signOut failed." , e);
-        	return ActionResult.REQUEST_FAILED;
+		} catch (IOException e) {
+        	return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	logger.warn("signOut failed." , e);
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.JSON_FAILED;
         }
-	}
+}
 	
 	/**
 	 * 处理登录失败
@@ -357,12 +353,10 @@ public class LiteFetion
 	        }else {
 	        	return ActionResult.REQUEST_FAILED;
 	        }
-        } catch (IOException e) {
-        	logger.warn("retirePersonalInfo failed." , e);
-        	return ActionResult.REQUEST_FAILED;
+		} catch (IOException e) {
+        	return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	logger.warn("retirePersonalInfo failed." , e);
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -410,10 +404,10 @@ public class LiteFetion
 	        }else {
 	        	return ActionResult.REQUEST_FAILED;
 	        }
-        } catch (IOException e) {
-        	return ActionResult.REQUEST_FAILED;
+		} catch (IOException e) {
+        	return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -439,12 +433,10 @@ public class LiteFetion
 	        }else {
 	        	return ActionResult.REQUEST_FAILED;
 	        }
-        } catch (IOException e) {
-        	logger.warn("Send Message failed.", e);
-        	return ActionResult.REQUEST_FAILED;
+		} catch (IOException e) {
+        	return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	logger.warn("Send Message failed.", e);
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -478,11 +470,9 @@ public class LiteFetion
 	        	return ActionResult.REQUEST_FAILED;
 	        }
         } catch (IOException e) {
-        	logger.debug("setImpresa failed" ,e);
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-         	logger.debug("setImpresa failed" ,e);
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -506,12 +496,10 @@ public class LiteFetion
 	        }else {
 	        	return ActionResult.REQUEST_FAILED;
 	        }
-        } catch (IOException e) {
-        	logger.debug("setPresence failed" ,e);
-        	return ActionResult.REQUEST_FAILED;
+		} catch (IOException e) {
+        	return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-         	logger.debug("setPresence failed" ,e);
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -566,12 +554,10 @@ public class LiteFetion
 	        	logger.debug("addBuddy failed, unkown status:"+status);
 	        	return ActionResult.REQUEST_FAILED;
 	        }
-        } catch (IOException e) {
-        	logger.debug("addBuddy failed" ,e);
-        	return ActionResult.REQUEST_FAILED;
+		} catch (IOException e) {
+        	return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-         	logger.debug("addBuddy failed" ,e);
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -604,13 +590,11 @@ public class LiteFetion
 		        	return ActionResult.REQUEST_FAILED;
 		        }
 		        
-	        } catch (IOException e) {
-	        	logger.debug("handleBuddyApplication failed" ,e);
-	        	return ActionResult.REQUEST_FAILED;
-	        } catch (JSONException e) {
-	         	logger.debug("handleBuddyApplication failed" ,e);
-	        	return ActionResult.REQUEST_FAILED;
-	        }
+		} catch (IOException e) {
+	        	return ActionResult.HTTP_FAILED;
+        } catch (JSONException e) {
+        	return ActionResult.JSON_FAILED;
+        }
 	}
 	
 	/**
@@ -633,13 +617,11 @@ public class LiteFetion
 	        	return ActionResult.REQUEST_FAILED;
 	        }
 	        
-         } catch (IOException e) {
-         	logger.debug("blackBuddy failed" ,e);
-         	return ActionResult.REQUEST_FAILED;
-         } catch (JSONException e) {
-          	logger.debug("BlackBuddy failed" ,e);
-         	return ActionResult.REQUEST_FAILED;
-         }
+		} catch (IOException e) {
+        	return ActionResult.HTTP_FAILED;
+        } catch (JSONException e) {
+        	return ActionResult.JSON_FAILED;
+        }
 	}
 	
 	/**
@@ -763,8 +745,7 @@ public class LiteFetion
 				return ActionResult.PORTRAIT_NOT_FOUND;
 			}
         } catch (IOException e) {
-        	logger.warn("retirePortart failed." , e);
-        	return ActionResult.REQUEST_FAILED;
+        	return ActionResult.HTTP_FAILED;
         }
 	}
 	
