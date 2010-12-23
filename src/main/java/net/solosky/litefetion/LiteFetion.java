@@ -28,7 +28,9 @@ package net.solosky.litefetion;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -641,6 +643,105 @@ public class LiteFetion
 	}
 	
 	/**
+	 * 批量发送短信
+	 * @param toBuddies		接受好友的列表，可以包含用户对象(litefetion.getUser())
+	 * @param message		原始消息内容，无需编码，发送时会自动编码
+	 * @return				操作状态
+	 */
+	public ActionResult batchSendSMS(List<Buddy> toBuddies, String message) {
+		try {
+			if(toBuddies==null || toBuddies.size()==0)	return ActionResult.WRONG_PARAM;
+			
+            //接受者参数应该是 346339663,346379375这样的格式
+            Iterator<Buddy> it = toBuddies.iterator();
+            StringBuffer recievers = new StringBuffer();
+            while(it.hasNext()) {
+            	  Buddy b = it.next();
+            	  recievers.append(Integer.toString(b.getUserId()));
+            	  if(it.hasNext()) {	//不是最后一个，则添加,
+            		  recievers.append(",");
+            	  }
+            }
+			
+    		HttpRequest request = this.createActionHttpRequest(Settings.WEBIM_URL_SEND_SMS);
+            request.addPostValue("UserName", Integer.toString(this.user.getUserId()));
+            request.addPostValue("Message", message);
+            request.addPostValue("Receivers", recievers.toString());
+            
+            HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
+            JSONObject json = new JSONObject(response.getResponseString());
+            int status = json.getInt("rc");
+            if(status==200) {
+            	return ActionResult.SUCCESS;
+            }else {
+            	return ActionResult.REQUEST_FAILED;
+            }
+		} catch (IOException e) {
+         	return ActionResult.HTTP_FAILED;
+         } catch (JSONException e) {
+          	return ActionResult.JSON_FAILED;
+         }
+	}
+	
+	/**
+	 * 发送定时短信
+	 * 
+	 * @param toBuddies		接受好友的列表，可以包含用户对象(litefetion.getUser())
+	 * @param message		原始消息内容，无需编码，发送时会自动编码
+	 * @param sendDate		发送的时间，最短时间是 当前时间+11分钟-一年后当前时间,否则返回错误
+	 * @return				操作状态
+	 */
+	
+	public ActionResult sendScheduleSMS(List<Buddy> toBuddies, String message, Date sendDate) {
+		try {
+			if(toBuddies==null || toBuddies.size()==0)	return ActionResult.WRONG_PARAM;
+			
+			//检查定时短信的定时时间，最短时间是 当前时间+11分钟-一年后当前时间
+			//比如当前时间是 2007.7.1 22:56 有效的时间是 2010.7.1 23:07 - 2011.7.1 22:56，在这个时间之内的才是有效时间，
+			Calendar calMin = Calendar.getInstance();
+			calMin.add(Calendar.MINUTE, 11);
+			Calendar calMax = Calendar.getInstance();
+			calMax.add(Calendar.YEAR, 1);
+			//判断是否在有效的范围内，如果不在这个范围内则返回发送时间错误
+			if(sendDate.before(calMin.getTime()) || sendDate.after(calMax.getTime())){
+				return ActionResult.WRONG_PARAM;
+			}
+            
+            //接受者参数应该是 346339663,346379375这样的格式
+            Iterator<Buddy> it = toBuddies.iterator();
+            StringBuffer recievers = new StringBuffer();
+            while(it.hasNext()) {
+            	  Buddy b = it.next();
+            	  recievers.append(Integer.toString(b.getUserId()));
+            	  if(it.hasNext()) {	//不是最后一个，则添加,
+            		  recievers.append(",");
+            	  }
+            }
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d H:m:s");
+            
+            HttpRequest request = this.createActionHttpRequest(Settings.WEBIM_URL_SET_SCHEDULESMS);
+            request.addPostValue("UserName", Integer.toString(this.user.getUserId()));
+            request.addPostValue("Message", message);
+            request.addPostValue("Receivers", recievers.toString());
+            request.addPostValue("SendTime", sdf.format(sendDate));
+            
+            HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
+            JSONObject json = new JSONObject(response.getResponseString());
+            int status = json.getInt("rc");
+            if(status==200) {
+            	return ActionResult.SUCCESS;
+            }else {
+            	return ActionResult.REQUEST_FAILED;
+            }
+		} catch (IOException e) {
+         	return ActionResult.HTTP_FAILED;
+         } catch (JSONException e) {
+          	return ActionResult.JSON_FAILED;
+         }
+	}
+	
+	/**
 	 * 获取好友头像
 	 * @param buddy		好友对象
 	 * @param size		头像大小，可以取1,2,3,4,5,6四个值，不同的值代表不同的头像大小:
@@ -667,11 +768,10 @@ public class LiteFetion
         }
 	}
 	
+	
 	/**
 	 * 发起长连接，获取服务主动发送的通知
 	 * 建立长连接是方便服务器可以及时的返回给客户端数据
-	 * @throws IOException 
-	 * @throws JSONException 
 	 */
 	public List<Notify> pollNotify()
 	{

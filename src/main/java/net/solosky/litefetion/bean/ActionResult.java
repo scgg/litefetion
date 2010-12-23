@@ -39,6 +39,11 @@ public enum ActionResult {
 	SUCCESS(200),
 	
 	/**
+	 * 参数错误
+	 */
+	WRONG_PARAM(400),
+	
+	/**
 	 * 好友已经存在
 	 */
 	BUDDY_EXISTS(410),	
@@ -49,9 +54,19 @@ public enum ActionResult {
 	VERIFY_FAILED(420),	
 	
 	/**
-	 * 请求失败，一般是网络问题或者服务器出了问题
+	 * 请求失败，服务器返回了错误的结果
 	 */
 	REQUEST_FAILED(430),
+	
+	/**
+	 * 网络错误
+	 */
+	HTTP_FAILED(440),
+	
+	/**
+	 * JSON解析错误
+	 */
+	JSON_FAILED(450),
 	
 	/**
 	 * 头像不存在

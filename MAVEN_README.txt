@@ -17,7 +17,14 @@
    mvn eclipse:eclipse
    之后再eclipse中  File -> Import ->Existing Projects into Workspace
 
-4. 打包
+4. Eclipse的设置
+   Window -> Preferences -> Java -> Build Path -> Classpath Variables，New
+   Name命名为M2_REPO，路径为你的本地的maven类库地址，
+      Window下为C:/Documents and Settings/{user}/.m2/repository，
+      Linux下为/home/{user}/.m2/repository
+设置成功后重新编译即可
+
+5. 打包
    mvn clean package
   
       
