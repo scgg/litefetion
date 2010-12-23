@@ -129,7 +129,7 @@ public class LiteFetionTest
 			
 			
 			//加入黑名单
-			//System.out.println("BlackBuddy:"+client.blackBuddy(testBuddy));
+			System.out.println("BlackBuddy:"+client.blackBuddy(testBuddy));
 			
 			//获取头像
 			System.out.println("RetirePortrait:"+client.retirePortrait(testBuddy, 4));
