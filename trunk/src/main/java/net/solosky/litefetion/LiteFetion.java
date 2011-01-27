@@ -34,6 +34,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.imageio.ImageIO;
 
@@ -701,7 +702,7 @@ public class LiteFetion
             }
             
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-d H:m:s");
-            
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT 0"));
             HttpRequest request = this.createActionHttpRequest(Settings.WEBIM_URL_SET_SCHEDULESMS);
             request.addPostValue("UserName", Integer.toString(this.user.getUserId()));
             request.addPostValue("Message", message);

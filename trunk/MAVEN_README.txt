@@ -20,8 +20,10 @@
 4. Eclipse的设置
    Window -> Preferences -> Java -> Build Path -> Classpath Variables，New
    Name命名为M2_REPO，路径为你的本地的maven类库地址，
-      Window下为C:/Documents and Settings/{user}/.m2/repository，
-      Linux下为/home/{user}/.m2/repository
+      Windows XP 下为 C:/Documents and Settings/{USER}/.m2/repository，
+      Windows Vista/7 下为 C:/User/{USER}/.m2/repository，
+      Linux下为/home/{USER}/.m2/repository
+(将{USER}替换为当前登录的用户名)
 设置成功后重新编译即可
 
 5. 打包
