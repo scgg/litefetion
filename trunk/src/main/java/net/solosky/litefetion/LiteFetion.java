@@ -381,7 +381,7 @@ public class LiteFetion
 	        		Buddy buddy = new Buddy();
 	        		buddy.setUri(jo.getString("uri"));
 	        		buddy.setUserId(jo.getInt("uid"));
-	        		buddy.setBlack(jo.getInt("isBk")==0);
+	        		buddy.setBlack(jo.getInt("isBk")==1);
 	        		buddy.setLocalName(jo.getString("ln"));
 	        		buddy.setCordIds(jo.getString("bl"));
 	        		buddy.setRelation(Relation.valueOf(jo.getInt("rs")));
