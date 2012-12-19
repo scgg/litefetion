@@ -259,6 +259,7 @@ public class LiteFetion
 		        request.addPostValue("Ccp", verifyImage.getVerifyCode());
 	        }
 	        request.addPostValue("OnlineStatus", Integer.toString(presence.getValue()));
+	        request.addPostValue("AccountType", account.indexOf("@")>=0 ? "2" : "1");
 	        HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
 	        JSONObject json = new JSONObject(response.getResponseString());
 	        int status =  json.getInt("rc");
