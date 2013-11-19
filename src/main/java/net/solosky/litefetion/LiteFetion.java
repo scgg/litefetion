@@ -29,12 +29,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 
@@ -666,6 +661,65 @@ public class LiteFetion
           	return ActionResult.JSON_FAILED;
          }
 	}
+
+    /**
+     * 给任何用户发送收费短信
+     * 注意：此接口发送的短信均为收费短信，无需添加好友，非移动号码也可以发送。
+     * 标准收费为0.1元/条
+     *
+     * @param mobile		接收的手机号码，联通，电信均可
+     * @param message		原始消息内容，无需编码，发送时会自动编码
+     * @return				操作状态
+     */
+    public ActionResult sendDirectSMS(String mobile, String message){
+        return batchSendDirectSMS(Arrays.asList(mobile), message);
+    }
+
+    /**
+     * 批量发送收费短信
+     * 注意：此接口发送的短信均为收费短信，无需添加好友，非移动号码也可以发送。
+     * 标准收费为0.1元/条
+     *
+     * @param mobiles		接收的手机号码列表，联通，电信均可
+     * @param message		原始消息内容，无需编码，发送时会自动编码
+     * @return				操作状态
+     */
+    public ActionResult batchSendDirectSMS(List<String> mobiles, String message){
+        try {
+            if(mobiles==null || mobiles.size() == 0 || message==null){
+                return ActionResult.WRONG_PARAM;
+            }
+
+            //接受者参数应该是 346339663,346379375这样的格式
+            Iterator<String> it = mobiles.iterator();
+            StringBuffer recievers = new StringBuffer();
+            while(it.hasNext()) {
+                recievers.append(it.next());
+                if(it.hasNext()) {	//不是最后一个，则添加,
+                    recievers.append(",");
+                }
+            }
+
+            HttpRequest request = this.createActionHttpRequest(Settings.WEBIM_URL_SEND_DIRECT_SMS);
+            request.addPostValue("UserName", Integer.toString(this.user.getUserId()));
+            request.addPostValue("msg", message);
+            request.addPostValue("receivers", recievers.toString());
+            request.addPostValue("type", "1");
+
+            HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
+            JSONObject json = new JSONObject(response.getResponseString());
+            int status = json.getInt("rc");
+            if(status==280) {
+                return ActionResult.SUCCESS;
+            }else {
+                return ActionResult.REQUEST_FAILED;
+            }
+        } catch (IOException e) {
+            return ActionResult.HTTP_FAILED;
+        } catch (JSONException e) {
+            return ActionResult.JSON_FAILED;
+        }
+    }
 	
 	/**
 	 * 发送定时短信
