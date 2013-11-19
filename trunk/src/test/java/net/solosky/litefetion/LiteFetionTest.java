@@ -62,7 +62,7 @@ public class LiteFetionTest
 		dialog.setVisible(true);
 		image = dialog.waitOK();
 		//执行登录
-		ActionResult r = client.login("15912345678","1234", Presence.AWAY, image);
+		ActionResult r = client.login("138xxxxxx","xxxx", Presence.AWAY, image);
 		System.out.println("LoginReulst:"+r.toString());
 		if(r==ActionResult.SUCCESS) {
 			
@@ -112,6 +112,9 @@ public class LiteFetionTest
 			
 			//给好友发送短信
 			System.out.println("SendSMS:"+client.sendMessage(testBuddy, "来自LiteFetion的短信。", true));
+
+            //发送收费短信
+            System.out.println("SendDirectSMS:"+client.sendDirectSMS("15652273767", "来自LiteFetion的短信。"));
 			
 			//设置心情短语
 			System.out.println("SetImpresa:"+client.setImpresa("ABDEE"));
