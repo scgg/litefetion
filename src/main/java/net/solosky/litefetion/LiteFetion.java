@@ -113,7 +113,7 @@ public class LiteFetion
 	/**
 	 * Logger
 	 */
-	private static Logger logger = Logger.getLogger(LiteFetion.class);
+	private static final Logger LOG = Logger.getLogger(LiteFetion.class);
 	
 	
 	/**
@@ -147,25 +147,25 @@ public class LiteFetion
         
 		//登录
 		ActionResult result = this.signIn(account, password, presence, verifyImage);
-        logger.debug("[Login] #1 SignIn:"+result.toString());
+        LOG.debug("[Login] #1 SignIn:" + result.toString());
         if(result!=ActionResult.SUCCESS)	return this.processLoginFailed(result, 1);
         
         //获取个人信息
         result = this.retirePersonalInfo();
-        logger.debug("[Login] #2 retirePersonalInfo:"+result.toString());
+        LOG.debug("[Login] #2 retirePersonalInfo:" + result.toString());
         if(result!=ActionResult.SUCCESS)	return this.processLoginFailed(result, 2);
         
         //获取好友列表
         result = this.retireBuddyList();
-        logger.debug("[Login] #3 retireBuddyList:"+result.toString());
+        LOG.debug("[Login] #3 retireBuddyList:" + result.toString());
         if(result!=ActionResult.SUCCESS)	return this.processLoginFailed(result, 3);
         
         
         //获取好友在线信息
         this.pollNotify();
-        logger.debug("[Login] #4 Poll Buddy State Notify: Success.");
+        LOG.debug("[Login] #4 Poll Buddy State Notify: Success.");
         
-        logger.debug("[Login] Login Success.");
+        LOG.debug("[Login] Login Success.");
         this.updateClientState(ClientState.ONLINE);
         return ActionResult.SUCCESS;
 	}
@@ -276,9 +276,11 @@ public class LiteFetion
 	        	return ActionResult.REQUEST_FAILED;
 	        }
         } catch (IOException e) {
-        	return ActionResult.HTTP_FAILED;
+            LOG.warn("io error", e);
+            return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	return ActionResult.JSON_FAILED;
+            LOG.warn("json parse error", e);
+            return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -294,10 +296,12 @@ public class LiteFetion
 	        JSONObject json = new JSONObject(response.getResponseString());
 	        int status =  json.getInt("rc");
 	        return status==200 ? ActionResult.SUCCESS : ActionResult.REQUEST_FAILED;
-		} catch (IOException e) {
-        	return ActionResult.HTTP_FAILED;
+        } catch (IOException e) {
+            LOG.warn("io error", e);
+            return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	return ActionResult.JSON_FAILED;
+            LOG.warn("json parse error", e);
+            return ActionResult.JSON_FAILED;
         }
 }
 	
@@ -306,7 +310,7 @@ public class LiteFetion
 	 */
 	private ActionResult processLoginFailed(ActionResult result, int step) {
 		this.updateClientState(ClientState.LOGIN_FAIL);
-		logger.warn("Login failed: [result="+result+", step="+step+"]");
+		LOG.warn("Login failed: [result=" + result + ", step=" + step + "]");
 		return result;
 	}
 	
@@ -350,10 +354,12 @@ public class LiteFetion
 	        }else {
 	        	return ActionResult.REQUEST_FAILED;
 	        }
-		} catch (IOException e) {
-        	return ActionResult.HTTP_FAILED;
+        } catch (IOException e) {
+            LOG.warn("io error", e);
+            return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	return ActionResult.JSON_FAILED;
+            LOG.warn("json parse error", e);
+            return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -366,44 +372,50 @@ public class LiteFetion
 		try {
 	        HttpRequest request = this.createActionHttpRequest(Settings.WEBIM_URL_GET_CONTACT_LIST);
 	        HttpResponse response = this.client.tryExecute(request, Settings.FEITON_MAX_REQUEST_EXECUTE_TIMES);
-	        JSONObject json = new JSONObject(response.getResponseString());
+	        JSONObject json = new JSONObject(response.getResponseString()); LOG.debug(json.toString());
 	        if(json.getInt("rc")==200) {
 	        	json = json.getJSONObject("rv");
 	        	//好友列表
 	        	this.buddyList.clear();
-	        	JSONArray buddies = json.getJSONArray("bds");
-	        	for(int i=0;i<buddies.length(); i++) {
-	        		JSONObject jo = buddies.getJSONObject(i);
-	        		Buddy buddy = new Buddy();
-	        		buddy.setUri(jo.getString("uri"));
-	        		buddy.setUserId(jo.getInt("uid"));
-	        		buddy.setBlack(jo.getInt("isBk")==1);
-	        		buddy.setLocalName(jo.getString("ln"));
-	        		buddy.setCordIds(jo.getString("bl"));
-	        		buddy.setRelation(Relation.valueOf(jo.getInt("rs")));
-	        		
-	        		this.buddyList.add(buddy);
-	        	}
+                if (!json.isNull("bds")){
+                    JSONArray buddies = json.getJSONArray("bds");
+                    for(int i=0;i<buddies.length(); i++) {
+                        JSONObject jo = buddies.getJSONObject(i);
+                        Buddy buddy = new Buddy();
+                        buddy.setUri(jo.getString("uri"));
+                        buddy.setUserId(jo.getInt("uid"));
+                        buddy.setBlack(jo.getInt("isBk")==1);
+                        buddy.setLocalName(jo.getString("ln"));
+                        buddy.setCordIds(jo.getString("bl"));
+                        buddy.setRelation(Relation.valueOf(jo.getInt("rs")));
+
+                        this.buddyList.add(buddy);
+                    }
+                }
 	        	
 	        	//分组列表
 	        	this.cordList.clear();
-	        	JSONArray cords = json.getJSONArray("bl");
-	        	for(int i=0; i<cords.length(); i++) {
-	        		JSONObject jo = cords.getJSONObject(i);
-	        		Cord cord = new Cord();
-	        		cord.setId(jo.getInt("id"));
-	        		cord.setTitle(jo.getString("n"));
-	        		
-	        		this.cordList.add(cord);
-	        	}
+                if (!json.isNull("bl")){
+                    JSONArray cords = json.getJSONArray("bl");
+                    for(int i=0; i<cords.length(); i++) {
+                        JSONObject jo = cords.getJSONObject(i);
+                        Cord cord = new Cord();
+                        cord.setId(jo.getInt("id"));
+                        cord.setTitle(jo.getString("n"));
+
+                        this.cordList.add(cord);
+                    }
+                }
 	        	
 	        	return ActionResult.SUCCESS;
 	        }else {
 	        	return ActionResult.REQUEST_FAILED;
 	        }
 		} catch (IOException e) {
+            LOG.warn("io error", e);
         	return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
+            LOG.warn("json parse error", e);
         	return ActionResult.JSON_FAILED;
         }
 	}
@@ -430,10 +442,12 @@ public class LiteFetion
 	        }else {
 	        	return ActionResult.REQUEST_FAILED;
 	        }
-		} catch (IOException e) {
-        	return ActionResult.HTTP_FAILED;
+        } catch (IOException e) {
+            LOG.warn("io error", e);
+            return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	return ActionResult.JSON_FAILED;
+            LOG.warn("json parse error", e);
+            return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -467,9 +481,11 @@ public class LiteFetion
 	        	return ActionResult.REQUEST_FAILED;
 	        }
         } catch (IOException e) {
-        	return ActionResult.HTTP_FAILED;
+            LOG.warn("io error", e);
+            return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	return ActionResult.JSON_FAILED;
+            LOG.warn("json parse error", e);
+            return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -493,10 +509,12 @@ public class LiteFetion
 	        }else {
 	        	return ActionResult.REQUEST_FAILED;
 	        }
-		} catch (IOException e) {
-        	return ActionResult.HTTP_FAILED;
+        } catch (IOException e) {
+            LOG.warn("io error", e);
+            return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	return ActionResult.JSON_FAILED;
+            LOG.warn("json parse error", e);
+            return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -548,13 +566,15 @@ public class LiteFetion
 	        }else if(status==521) {
 	        	return ActionResult.BUDDY_EXISTS;		//已经在好友列表中
 	        }else {
-	        	logger.debug("addBuddy failed, unkown status:"+status);
+	        	LOG.debug("addBuddy failed, unkown status:" + status);
 	        	return ActionResult.REQUEST_FAILED;
 	        }
-		} catch (IOException e) {
-        	return ActionResult.HTTP_FAILED;
+        } catch (IOException e) {
+            LOG.warn("io error", e);
+            return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	return ActionResult.JSON_FAILED;
+            LOG.warn("json parse error", e);
+            return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -586,12 +606,14 @@ public class LiteFetion
 		        }else {
 		        	return ActionResult.REQUEST_FAILED;
 		        }
-		        
-		} catch (IOException e) {
-	        	return ActionResult.HTTP_FAILED;
-        } catch (JSONException e) {
-        	return ActionResult.JSON_FAILED;
-        }
+
+         } catch (IOException e) {
+             LOG.warn("io error", e);
+             return ActionResult.HTTP_FAILED;
+         } catch (JSONException e) {
+             LOG.warn("json parse error", e);
+             return ActionResult.JSON_FAILED;
+         }
 	}
 	
 	/**
@@ -613,11 +635,13 @@ public class LiteFetion
 	        }else {
 	        	return ActionResult.REQUEST_FAILED;
 	        }
-	        
-		} catch (IOException e) {
-        	return ActionResult.HTTP_FAILED;
+
+        } catch (IOException e) {
+            LOG.warn("io error", e);
+            return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
-        	return ActionResult.JSON_FAILED;
+            LOG.warn("json parse error", e);
+            return ActionResult.JSON_FAILED;
         }
 	}
 	
@@ -655,11 +679,13 @@ public class LiteFetion
             }else {
             	return ActionResult.REQUEST_FAILED;
             }
-		} catch (IOException e) {
-         	return ActionResult.HTTP_FAILED;
-         } catch (JSONException e) {
-          	return ActionResult.JSON_FAILED;
-         }
+        } catch (IOException e) {
+            LOG.warn("io error", e);
+            return ActionResult.HTTP_FAILED;
+        } catch (JSONException e) {
+            LOG.warn("json parse error", e);
+            return ActionResult.JSON_FAILED;
+        }
 	}
 
     /**
@@ -715,8 +741,10 @@ public class LiteFetion
                 return ActionResult.REQUEST_FAILED;
             }
         } catch (IOException e) {
+            LOG.warn("io error", e);
             return ActionResult.HTTP_FAILED;
         } catch (JSONException e) {
+            LOG.warn("json parse error", e);
             return ActionResult.JSON_FAILED;
         }
     }
@@ -772,11 +800,13 @@ public class LiteFetion
             }else {
             	return ActionResult.REQUEST_FAILED;
             }
-		} catch (IOException e) {
-         	return ActionResult.HTTP_FAILED;
-         } catch (JSONException e) {
-          	return ActionResult.JSON_FAILED;
-         }
+        } catch (IOException e) {
+            LOG.warn("io error", e);
+            return ActionResult.HTTP_FAILED;
+        } catch (JSONException e) {
+            LOG.warn("json parse error", e);
+            return ActionResult.JSON_FAILED;
+        }
 	}
 	
 	/**
@@ -839,11 +869,11 @@ public class LiteFetion
         		notifyList.add(new ClientStateNotify(ClientState.NET_ERROR));
         		this.pollNotifyFailed = 0;	//清零，防止再次登录
         	}
-	        logger.warn("Poll Notify failed." , e);
+	        LOG.warn("Poll Notify failed.", e);
         } catch (JSONException e) {
-        	 logger.warn("Poll Notify failed." , e);
+        	 LOG.warn("Poll Notify failed.", e);
         }
-		logger.debug("Poll Notify: notify size:"+notifyList.size());
+		LOG.debug("Poll Notify: notify size:" + notifyList.size());
 		return notifyList;
 	}
 	
@@ -877,7 +907,7 @@ public class LiteFetion
     				buddy.setPresence(data.optInt("pb"));
                     buddy.setCrc(data.optString("crc"));
     				BuddyState currentState = buddy.getState();
-    				logger.debug("BuddyState changed: buddy="+buddy.getDisplayName()+", before="+beforeState+", current="+currentState);
+    				LOG.debug("BuddyState changed: buddy=" + buddy.getDisplayName() + ", before=" + beforeState + ", current=" + currentState);
     				return new BuddyStateNotify(beforeState, currentState, buddy);
 				}
 				break;
@@ -888,7 +918,7 @@ public class LiteFetion
 				int msgType  = data.getInt("msgType");
 				buddy = this.getBuddyByUserId(fromUserId);
 				if(msgType==2 && buddy!=null) {		//接收到消息
-					logger.debug("Buddy Message received: buddy="+buddy.getDisplayName()+", text="+message);
+					LOG.debug("Buddy Message received: buddy=" + buddy.getDisplayName() + ", text=" + message);
 					return new BuddyMessageNotify(buddy, message, new Date());
 				}else if(msgType==3 || msgType==4) {		//TODO ..发送消息失败，暂不处理..
 				}
@@ -904,7 +934,7 @@ public class LiteFetion
 				}else {
 					state = ClientState.LOGOUT;
 				}
-				logger.debug("ClientState changed: clientState="+state);
+				LOG.debug("ClientState changed: clientState=" + state);
 				return new ClientStateNotify(state);
 				
 			case 5:	//添加好友请求
@@ -914,7 +944,7 @@ public class LiteFetion
 				buddy.setRelation(Relation.STRANGER);
 				this.buddyList.add(buddy);	//暂时添加到好友列表中
 				String desc = data.getString("desc");
-				logger.debug("Buddy Application received: buddy="+buddy+", desc="+desc);
+				LOG.debug("Buddy Application received: buddy=" + buddy + ", desc=" + desc);
 				return new BuddyApplicationNotify(buddy, desc);
 				
 				
@@ -924,7 +954,7 @@ public class LiteFetion
 					if(buddy!=null) {
 						Relation relation = Relation.valueOf(data.getInt("rs"));
 						buddy.setRelation(relation);
-						logger.debug("Buddy confirmed application: buddy="+buddy+", isAgreed="+(relation==Relation.DECLINED));
+						LOG.debug("Buddy confirmed application: buddy=" + buddy + ", isAgreed=" + (relation == Relation.DECLINED));
 						return new ApplicationConfirmedNotify(buddy, relation==Relation.BUDDY);
 					}
 				}
